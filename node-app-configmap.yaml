@@ -1,0 +1,17 @@
+# 05-node-app-configmap.yaml
+#
+# This Kubernetes ConfigMap stores non-sensitive configuration data
+# for the Node.js application, such as database host and database name.
+#
+apiVersion: v1
+kind: ConfigMap # Resource type for a ConfigMap
+metadata:
+  name: node-app-config # Name of the ConfigMap
+  labels:
+    app: node-app # Label for easy identification
+data:
+  DB_HOST: postgres-service # Hostname for the database, matching the PostgreSQL service name
+  DB_NAME: mydatabase # Database name, matching the POSTGRES_DB in the postgres deployment
+  DB_USER: user # Database user, matching the POSTGRES_USER in the postgres deployment
+  DB_PORT: "5432" # Database port
+  APP_PORT: "3000" # Port your Node.js application listens on

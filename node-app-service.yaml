@@ -1,0 +1,23 @@
+# 07-node-app-service.yaml
+#
+# This Kubernetes Service exposes your Node.js application.
+# It can be accessed within the cluster by its service name
+# or externally depending on the type.
+#
+apiVersion: v1
+kind: Service # Resource type for a service
+metadata:
+  name: node-app-service # Name of the service
+  labels:
+    app: node-app # Label for the service
+spec:
+  selector:
+    app: node-app # Selector to route traffic to pods with this label
+  ports:
+    - protocol: TCP # Protocol used for the port
+      port: 80 # The port at which this service is exposed (e.g., your users will access port 80)
+      targetPort: 3000 # The port on the container to which the service sends traffic (your Node.js app's port)
+      name: http
+  type: LoadBalancer # Type of service. 'LoadBalancer' exposes the service externally
+                     # via a cloud provider's load balancer. For local development,
+                     # you might use 'NodePort' or 'ClusterIP' if accessed via ingress.

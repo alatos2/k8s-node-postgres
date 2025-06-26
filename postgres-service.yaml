@@ -1,0 +1,21 @@
+# 04-postgres-service.yaml
+#
+# This Kubernetes Service exposes the PostgreSQL database within the cluster.
+# It provides a stable DNS name and IP address for other applications (like Node.js)
+# to connect to the database.
+#
+apiVersion: v1
+kind: Service # Resource type for a service
+metadata:
+  name: postgres-service # Name of the service
+  labels:
+    app: postgres # Label for the service
+spec:
+  selector:
+    app: postgres # Selector to route traffic to pods with this label
+  ports:
+    - protocol: TCP # Protocol used for the port
+      port: 5432 # Port exposed by the service (inside the cluster)
+      targetPort: 5432 # Port on the container to which the service sends traffic
+  type: ClusterIP # Type of service. 'ClusterIP' makes it only accessible within the cluster.
+                  # Use NodePort or LoadBalancer if you need external access (not recommended for DB).

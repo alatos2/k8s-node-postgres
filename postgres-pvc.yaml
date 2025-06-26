@@ -1,0 +1,18 @@
+# 02-postgres-pvc.yaml
+#
+# This Kubernetes Persistent Volume Claim (PVC) requests persistent storage
+# for the PostgreSQL database. This ensures that your database data
+# is not lost if the pod restarts or moves to another node.
+#
+apiVersion: v1
+kind: PersistentVolumeClaim # Resource type for persistent storage claim
+metadata:
+  name: postgres-pvc # Name of the PVC
+  labels:
+    app: postgres # Label for easy identification
+spec:
+  accessModes:
+    - ReadWriteOnce # Defines how the volume can be accessed (single node read-write)
+  resources:
+    requests:
+      storage: 5Gi # Requests 5 Gigabytes of storage. Adjust as needed.

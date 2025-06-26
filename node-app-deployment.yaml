@@ -1,0 +1,62 @@
+# 06-node-app-deployment.yaml
+#
+# This Kubernetes Deployment manages the Node.js application pods.
+# It ensures that a specified number of replicas are running and handles
+# rolling updates and rollbacks.
+#
+apiVersion: apps/v1
+kind: Deployment # Resource type for a deployment
+metadata:
+  name: node-app-deployment # Name of the deployment
+  labels:
+    app: node-app # Label for the deployment
+spec:
+  replicas: 2 # Number of desired replicas for your Node.js application. Adjust as needed.
+  selector:
+    matchLabels:
+      app: node-app # Selector to match pods managed by this deployment
+  template:
+    metadata:
+      labels:
+        app: node-app # Labels applied to the pods created by this deployment
+    spec:
+      containers:
+        - name: node-app # Name of the container
+          image: your-docker-registry/your-node-app-image:1.0.0 # IMPORTANT: Replace with your actual Node.js Docker image
+          imagePullPolicy: Always # Always pull the latest image
+          ports:
+            - containerPort: 3000 # Port your Node.js app listens on (as defined in your app)
+              name: http-port
+          env:
+            # Environment variables sourced from the ConfigMap.
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: node-app-config # Name of the ConfigMap
+                  key: DB_HOST # Key within the ConfigMap
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: node-app-config
+                  key: DB_NAME
+            - name: DB_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: node-app-config
+                  key: DB_USER
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: node-app-config
+                  key: DB_PORT
+            - name: APP_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: node-app-config
+                  key: APP_PORT
+            # Environment variable for the database password, sourced from the Secret.
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret # Name of the Secret
+                  key: POSTGRES_PASSWORD # Key within the Secret

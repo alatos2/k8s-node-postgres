@@ -1,0 +1,54 @@
+# 03-postgres-deployment.yaml
+#
+# This Kubernetes Deployment manages the PostgreSQL database pods.
+# It ensures that a specified number of replicas are running and handles
+# rolling updates and rollbacks.
+#
+apiVersion: apps/v1
+kind: Deployment # Resource type for a deployment
+metadata:
+  name: postgres-deployment # Name of the deployment
+  labels:
+    app: postgres # Label for the deployment
+spec:
+  replicas: 1 # Number of desired replicas for the PostgreSQL pod
+  selector:
+    matchLabels:
+      app: postgres # Selector to match pods managed by this deployment
+  strategy:
+    type: Recreate # Strategy to ensure database integrity during updates
+                   # (recreates pods instead of rolling update to avoid data issues)
+  template:
+    metadata:
+      labels:
+        app: postgres # Labels applied to the pods created by this deployment
+    spec:
+      containers:
+        - name: postgres # Name of the container
+          image: postgres:13 # PostgreSQL image version. You can choose a different version.
+          imagePullPolicy: IfNotPresent # Pull image if not already present on the node
+          ports:
+            - containerPort: 5432 # Default port for PostgreSQL
+              name: pg-port
+          env:
+            # Environment variable for the database user.
+            - name: POSTGRES_USER
+              value: "user" # Default database user
+            # Environment variable for the database name.
+            - name: POSTGRES_DB
+              value: "mydatabase" # Default database name
+            # Environment variable for the database password, sourced from the Secret.
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret # Name of the Secret where password is stored
+                  key: POSTGRES_PASSWORD # Key within the Secret that holds the password
+          volumeMounts:
+            # Mount the persistent volume at the default PostgreSQL data directory.
+            - name: postgres-storage # Name of the volume mount
+              mountPath: /var/lib/postgresql/data # Path inside the container for data persistence
+      volumes:
+        # Define the volume to be used by this pod, referencing the PVC.
+        - name: postgres-storage # Name of the volume
+          persistentVolumeClaim:
+            claimName: postgres-pvc # Name of the Persistent Volume Claim
